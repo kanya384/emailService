@@ -1,0 +1,176 @@
+basePath: /
+definitions:
+  delivery.CrateDeliveryRequest:
+    properties:
+      sendAt:
+        example: "2022-10-25T15:33:35.304895357+03:00"
+        type: string
+      subject:
+        example: Lorem Ipsum
+        type: string
+      subscribers:
+        items:
+          $ref: '#/definitions/delivery.DeliverySubscriber'
+        type: array
+      template_id:
+        example: 00000000-0000-0000-0000-000000000000
+        format: uuid
+        type: string
+    required:
+    - sendAt
+    - subject
+    - subscribers
+    - template_id
+    type: object
+  delivery.CreateDeliveryResponse:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      modifiedAt:
+        type: string
+      subject:
+        type: string
+      templateID:
+        type: string
+    type: object
+  delivery.DeliverySubscriber:
+    properties:
+      age:
+        example: 15
+        maximum: 100
+        minimum: 10
+        type: integer
+      email:
+        example: test01@mail.ru
+        format: email
+        type: string
+      name:
+        example: Ivan
+        type: string
+      surname:
+        example: Ivanov
+        type: string
+    required:
+    - email
+    - name
+    - surname
+    type: object
+  http.ErrorResponse:
+    properties:
+      msg:
+        type: string
+    type: object
+  template.TemplateResponse:
+    properties:
+      createdAt:
+        type: string
+      id:
+        example: 00000000-0000-0000-0000-000000000000
+        format: uuid
+        type: string
+      modifiedAt:
+        type: string
+      path:
+        example: /storage/file
+        type: string
+    required:
+    - createdAt
+    - id
+    - modifiedAt
+    - path
+    type: object
+info:
+  contact:
+    email: kanya384@mail.ru
+    name: API Support
+  description: email service
+  title: email service
+  version: "1.0"
+paths:
+  /delivery/:
+    get:
+      consumes:
+      - application/json
+      description: Рендерит скрытую гифку для письма и помечает прочитанные письма.
+      parameters:
+      - description: Идентификатор рассылки
+        in: path
+        name: deliveryId
+        required: true
+        type: string
+      - description: Идентификатор подписчика
+        in: path
+        name: subscriberId
+        required: true
+        type: string
+      produces:
+      - image/gif
+      responses:
+        "200":
+          description: OK
+      summary: Рендерит скрытую гифку для письма и помечает прочитанные письма.
+      tags:
+      - delivery
+    post:
+      consumes:
+      - application/json
+      description: Создает рассылку.
+      parameters:
+      - description: Данные по рассылке
+        in: body
+        name: delivery
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.CrateDeliveryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "201":
+          description: Структура рассылки
+          schema:
+            $ref: '#/definitions/delivery.CreateDeliveryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: 404 Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Создает рассылку.
+      tags:
+      - delivery
+  /template/:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Добавляет шаблон письма.
+      parameters:
+      - description: Файл шаблона
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Структура шаблона
+          schema:
+            $ref: '#/definitions/template.TemplateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Добавляет шаблон письма.
+      tags:
+      - templates
+swagger: "2.0"

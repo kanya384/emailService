@@ -1,0 +1,46 @@
+version: '3.3'
+networks:
+  app-net:
+    driver: bridge
+services:
+  postgres:
+    image: postgres
+    container_name: 'postgres'
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_DB: ${PG_DBNAME}
+    networks:
+      - app-net
+    volumes:
+      - ../data:/var/lib/postgresql/data
+  app:
+    build:
+      context: ../
+    container_name: app
+    depends_on:
+      - postgres
+    networks:
+      - app-net
+    ports:
+      - 8080:8080
+    volumes:
+      - ./storage:/storage
+      - ./migrations:/migrations
+      - ./vars:/vars
+    restart: always
+    environment:
+      APP_HOST: ${APP_HOST}
+      APP_PORT: ${APP_PORT}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_USER: ${PG_USER}
+      PG_PASS: ${PG_PASS}
+      PG_DBNAME: ${PG_DBNAME}
+      PG_POOL_MAX: ${PG_POOL_MAX}
+      LOG_LEVEL: ${LOG_LEVEL}
+      FILESTORE_PATH: ${FILESTORE_PATH}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_LOGIN: ${EMAIL_LOGIN}
+      EMAIL_PASS: ${EMAIL_PASS}

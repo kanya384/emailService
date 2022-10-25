@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS subscribers;
+DROP TABLE IF EXISTS template;
+DROP TABLE IF EXISTS delivery;
